@@ -11,8 +11,15 @@ class ConnectionServiceProvider implements ServiceProviderInterface
         // Setting
         $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/config', '\\Plugin\\KaiUConnection\\Controller\\ConfigController::index')->bind('plugin_KaiUConnection_config');
 
+        $app->match('/block/kaiu_tag_block', '\Plugin\KaiUConnection\Controller\Block\TagController::index')
+            ->bind('block_kaiu_tag_block');
+
         $app['kaiu.repository.tag'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Plugin\KaiUConnection\Entity\Tag');
+        });
+
+        $app['kaiu.service.api'] = $app->share(function () use ($app) {
+            return new \Plugin\KaiUConnection\Service\ApiService($app);
         });
 
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
