@@ -1,0 +1,2 @@
+default_frame.twig:
+    - [onChangeMetaTag, NORMAL]

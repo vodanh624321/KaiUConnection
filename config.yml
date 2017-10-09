@@ -1,0 +1,10 @@
+name: KaiU Connection
+event: KaiUConnection
+code: KaiUConnection
+version: 1.0.0
+service:
+    - ConnectionServiceProvider
+orm.path:
+    - /Resource/doctrine
+const:
+    max_value_length: 50

@@ -1,0 +1,34 @@
+Plugin\KaiUConnection\Entity\Tag:
+    type: entity
+    table: plg_kaiu_connection
+    repositoryClass: Plugin\KaiUConnection\Repository\TagRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: tag_id
+            generator:
+                strategy: AUTO
+    fields:
+        tag_name:
+            type: text
+            nullable: false
+            column: tag_name
+        tag_value:
+            type: text
+            nullable: false
+            column: tag_value
+        del_flg:
+            type: smallint
+            nullable: false
+            unsigned: false
+            default: '0'
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+    lifecycleCallbacks: {  }
