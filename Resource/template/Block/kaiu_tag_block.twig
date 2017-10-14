@@ -1,1 +1,3 @@
-<meta name="test" content="test=1.0">
+{% for tag in tags %}
+	{{tag|raw}}
+{% endfor %}

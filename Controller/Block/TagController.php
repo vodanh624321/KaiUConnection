@@ -24,8 +24,13 @@ class TagController
          */
         $repo = $app['kaiu.repository.tag'];
         $tags = $repo->findAll();
+        $arrTag = array();
+        foreach ($tags as $value) {
+            $arrTag[] = unserialize($value->getTag());
+        }
+
         return $app->render('Block/kaiu_tag_block.twig', array(
-            'tags' => $tags,
+            'tags' => $arrTag,
         ));
     }
 }
