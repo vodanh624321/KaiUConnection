@@ -2,60 +2,97 @@
 
 {% set menus = ['content', 'kaiu_connect'] %}
 
-{% block title %}KaiU connection{% endblock %}
-{% block sub_title %}Config{% endblock %}
+{% block title %}KaiU接続{% endblock %}
+{% block sub_title %}設定{% endblock %}
 
 {% form_theme form 'Form/bootstrap_3_horizontal_layout.html.twig' %}
 
 {% block main %}
-    <form method="post" action="{{ url('plugin_KaiUConnection_config') }}">
-        {{ form_widget(form._token) }}
-        <div class="row" id="aside_wrap">
-            <div class="col-md-9">
-                <div class="box">
-                    <div class="box-header">
-                        <h3 class="box-title">設定</h3>
-                    </div><!-- /.box-header -->
-                    <div id="result_list__body_inner" class="table-responsive">
-                        <table id="result_list__list" class="table table-bordered table-striped">
-                            <colgroup>
-                                <col width="50%">
-                                <col>
-                            </colgroup>
-                            <tr id="result_list__list_header">
-                                <th id="result_list__header_name">Name</th>
-                                <th id="result_list__header_value">Value</th>
-                            </tr>
-                            {% for key,tag in form.tags %}
-                                <tr id="result_list__item--{{key}}">
-                                    <td id="result_list__name--{{key}}">
-                                        {{form_widget(tag.tag_name)}}
-                                        {{form_errors(tag.tag_name)}}
-                                    </td>
-                                    <td id="result_list__value--{{key}}">
-                                        {{form_widget(tag.tag_value)}}
-                                        {{form_errors(tag.tag_value)}}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </table>
-                    </div>
-                </div><!-- /.box -->
-            </div><!-- /.col -->
+    <div class="row" id="aside_wrap">
+        <div id="detail_wrap" class="col-md-9">
+            <div id="detail_box" class="box">
+                <div id="detail_box__header" class="box-header">
+                    <h3 class="box-title">KaiU Platform plugin</h3>
+                </div><!-- /.box-header -->
+                <form role="form" class="form-horizontal" name="form1" id="form1" method="post" action="{{ url('plugin_KaiUConnection_config') }}">
+                    <div id="detail_box__body" class="box-body">
+                        {{ form_row(form._token) }}
 
-            <div class="col-md-3">
-                <div class="col_inner" id="aside_column">
-                    <div class="box no-header">
-                        <div class="box-body">
-                            <div class="row text-center">
-                                <div class="col-sm-6 col-sm-offset-3 col-md-12 col-md-offset-0">
-                                    <button class="btn btn-primary btn-block btn-lg" type="submit">設定</button>
-                                </div>
+                        {{ form_row(form.id) }}
+                        {{ form_row(form.token) }}
+
+                        {{ form_row(form.site_url) }}
+
+                        {{ form_row(form.site_name) }}
+                        {{ form_row(form.email) }}
+                    </div><!-- /.box-body -->
+                </form>
+            </div><!-- /.box -->
+        </div><!-- /.col -->
+
+        <div class="col-md-3" id="aside_column">
+            <div id="common_box" class="col_inner">
+                <div id="common_box__body" class="box no-header">
+                    <div id="common_button_box" class="box-body">
+                        <div id="common_button_box__insert_button" class="row text-center">
+                            <div class="col-sm-6 col-sm-offset-3 col-md-12 col-md-offset-0">
+                                <button class="btn btn-primary btn-block btn-lg" onclick="document.form1.submit(); return false;">登録</button>
                             </div>
-                        </div><!-- /.box-body -->
-                    </div><!-- /.box -->
+                        </div>
+                    </div><!-- /.box-body -->
+                </div><!-- /.box -->
+            </div>
+        </div><!-- /.col -->
+    </div>
+
+    <div id="tag_wrap" class="row">
+        <div id="tag_list_box" class="col-md-12">
+            <div id="tag_list_box__body" class="box">
+                <div id="tag_list_box__header" class="box-header">
+                    <h3 class="box-title">サイトリスト</h3>
+                </div><!-- /.box-header -->
+                <div id="tag_list_box__body_inner" class="box-body">
+                    <div id="tag_list_box__list_box" class="table_list">
+                        <div id="tag_list_box__list" class="table-responsive with-border">
+                            <table class="table table-striped">
+                                <thead>
+                                   <tr id="tag_list_box__list_header">
+                                        <th id="tag_list_box__header_site">サイトID</th>
+                                        <th id="tag_list_box__header_url">サイトのURL</th>
+                                        <th id="tag_list_box__header_name">サイト名</th>
+                                        <th id="tag_list_box__header_email">メールアドレス</th>
+                                        <th id="tag_list_box__header_menu_box">&nbsp;</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% for tag in tags %}
+                                    <tr id="tag_list_box__item--{{ tag.id }}">
+                                        <td id="tag_list_box__site--{{ tag.id }}">{{ tag.site_id }}</td>
+                                        <td id="tag_list_box__url--{{ tag.id }}">{{ tag.site_url }}</td>
+                                        <td id="tag_list_box__name--{{ tag.id }}">{{ tag.site_name }}</td>
+                                        <td id="tag_list_box__email--{{ tag.id }}">{{ tag.email }}</td>
+                                        
+
+                                        <td id="tag_list_box__menu_box--{{ tag.id }}">
+                                        <div id="tag_list_box__menu_box_toggle--{{ tag.id }}" class="dropdown">
+                                            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
+                                            <ul id="tag_list_box__menu--{{ tag.id }}" class="dropdown-menu dropdown-menu-right">
+                                                {% if tag.tag is null%}
+                                                <li><a href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグ</a>
+                                                {% endif %}
+                                                </li>
+                                                <li><a href="{{ url('plugin_KaiUConnection_delete', {id: tag.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete" data-message="このタグ情報を削除してもよろしいですか？">削除</a></li>
+                                            </ul>
+                                                </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
-            </div><!-- /.col -->
+            </div><!-- /.box -->
         </div>
-    </form>
+    </div>
 {% endblock %}

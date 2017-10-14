@@ -9,7 +9,17 @@ class ConnectionServiceProvider implements ServiceProviderInterface
     public function register(BaseApplication $app)
     {
         // Setting
-        $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/config', '\\Plugin\\KaiUConnection\\Controller\\ConfigController::index')->bind('plugin_KaiUConnection_config');
+        $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/config',
+        '\\Plugin\\KaiUConnection\\Controller\\ConfigController::index')
+        ->bind('plugin_KaiUConnection_config');
+
+        $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/{id}/get',
+        '\\Plugin\\KaiUConnection\\Controller\\ConfigController::getTag')->assert('id', '\d+')
+        ->bind('plugin_KaiUConnection_get');
+
+        $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/{id}/delete',
+        '\\Plugin\\KaiUConnection\\Controller\\ConfigController::deleteTag')->assert('id', '\d+')
+        ->bind('plugin_KaiUConnection_delete');
 
         $app->match('/block/kaiu_tag_block', '\Plugin\KaiUConnection\Controller\Block\TagController::index')
             ->bind('block_kaiu_tag_block');
@@ -23,7 +33,6 @@ class ConnectionServiceProvider implements ServiceProviderInterface
         });
 
         $app['form.types'] = $app->share($app->extend('form.types', function ($types) use ($app) {
-            $types[] = new \Plugin\KaiUConnection\Form\Type\TagType($app);
             $types[] = new \Plugin\KaiUConnection\Form\Type\ConfigType($app);
 
             return $types;

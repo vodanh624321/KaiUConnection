@@ -1,6 +1,9 @@
 <?php
 namespace Plugin\KaiUConnection\Entity;
 
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Mapping\ClassMetadata;
+
 /**
  * KaiU connection
  */
@@ -14,12 +17,32 @@ class Tag extends \Eccube\Entity\AbstractEntity
     /**
      * @var string
      */
-    private $tag_name;
+    private $site_name;
 
     /**
      * @var string
      */
-    private $tag_value;
+    private $token;
+
+    /**
+     * @var string
+     */
+    private $site_id;
+
+    /**
+     * @var string
+     */
+    private $site_url;
+
+    /**
+     * @var string
+     */
+    private $email;
+
+    /**
+     * @var string
+     */
+    private $tag;
 
     /**
      * @var int
@@ -60,21 +83,11 @@ class Tag extends \Eccube\Entity\AbstractEntity
      * @param  string $subData
      * @return $this
      */
-    public function setTagName($subData)
+    public function setId($subData)
     {
-        $this->tag_name = $subData;
+        $this->id = $subData;
 
         return $this;
-    }
-
-    /**
-     * Get sub_data
-     *
-     * @return string
-     */
-    public function getTagName()
-    {
-        return $this->tag_name;
     }
 
     /**
@@ -83,9 +96,9 @@ class Tag extends \Eccube\Entity\AbstractEntity
      * @param  string $subData
      * @return $this
      */
-    public function setTagValue($subData)
+    public function setSiteId($subData)
     {
-        $this->tag_value = $subData;
+        $this->site_id = $subData;
 
         return $this;
     }
@@ -95,9 +108,125 @@ class Tag extends \Eccube\Entity\AbstractEntity
      *
      * @return string
      */
-    public function getTagValue()
+    public function getSiteId()
     {
-        return $this->tag_value;
+        return $this->site_id;
+    }
+
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setToken($subData)
+    {
+        $this->token = $subData;
+
+        return $this;
+    }
+
+    /**
+     * Get sub_data
+     *
+     * @return string
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setSiteName($subData)
+    {
+        $this->site_name = $subData;
+
+        return $this;
+    }
+
+    /**
+     * Get sub_data
+     *
+     * @return string
+     */
+    public function getSiteName()
+    {
+        return $this->site_name;
+    }
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setSiteUrl($subData)
+    {
+        $this->site_url = $subData;
+
+        return $this;
+    }
+
+    /**
+     * Get sub_data
+     *
+     * @return string
+     */
+    public function getSiteUrl()
+    {
+        return $this->site_url;
+    }
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setEmail($subData)
+    {
+        $this->email = $subData;
+
+        return $this;
+    }
+
+    /**
+     * Get sub_data
+     *
+     * @return string
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setTag($subData)
+    {
+        $this->tag = $subData;
+
+        return $this;
+    }
+
+    /**
+     * Get sub_data
+     *
+     * @return string
+     */
+    public function getTag()
+    {
+        return $this->tag;
     }
 
     /**
@@ -169,6 +298,13 @@ class Tag extends \Eccube\Entity\AbstractEntity
     public function getUpdateDate()
     {
         return $this->update_date;
+    }
+
+    public static function loadValidatorMetadata(ClassMetadata $metadata)
+    {
+        $metadata->addConstraint(new UniqueEntity(array(
+            'fields'  => 'site_url',
+        )));
     }
 
 }

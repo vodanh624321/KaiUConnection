@@ -7,4 +7,4 @@ service:
 orm.path:
     - /Resource/doctrine
 const:
-    max_value_length: 50
+    api_url: https://stg.kaiu-marketing.com/api/sites

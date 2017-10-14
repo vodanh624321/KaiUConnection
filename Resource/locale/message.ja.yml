@@ -1,1 +1,4 @@
-plugin.connect.type.tag_name.error: Error
+plugin.connect.add.success: 新しいサイトを正常に追加する
+plugin.connect.add.error: 新しいサイトを追加できませんでした
+plugin.connect.get_tag.success: タグを取得できませんでした
+plugin.connect.delete.success: タグを削除しました

@@ -2,6 +2,8 @@
 namespace Plugin\KaiUConnection\Repository;
 
 use Doctrine\ORM\EntityRepository;
+use Plugin\KaiUConnection\Entity\Tag;
+use Eccube\Common\Constant;
 
 /**
  * ModuleRepository
@@ -11,4 +13,41 @@ use Doctrine\ORM\EntityRepository;
  */
 class TagRepository extends EntityRepository
 {
+	public function save(Tag $tag)
+	{
+		$em = $this->getEntityManager();
+        $em->getConnection()->beginTransaction();
+        try {
+            $tag->setDelFlg(Constant::DISABLED);
+            $em->persist($tag);
+            $em->flush($tag);
+
+            $em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+
+            return false;
+        }
+
+        return true;
+	}
+
+    public function delete(Tag $tag)
+    {
+        $em = $this->getEntityManager();
+        $em->getConnection()->beginTransaction();
+        try {
+            $tag->setDelFlg(Constant::ENABLED);
+            $em->persist($tag);
+            $em->flush($tag);
+
+            $em->getConnection()->commit();
+        } catch (\Exception $e) {
+            $em->getConnection()->rollback();
+
+            return false;
+        }
+
+        return true;
+    }
 }

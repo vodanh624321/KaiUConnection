@@ -12,14 +12,30 @@ Plugin\KaiUConnection\Entity\Tag:
             generator:
                 strategy: AUTO
     fields:
-        tag_name:
+        token:
             type: text
-            nullable: false
-            column: tag_name
-        tag_value:
+            nullable: true
+            column: token
+        site_id:
             type: text
-            nullable: false
-            column: tag_value
+            nullable: true
+            column: site_id
+        site_name:
+            type: text
+            nullable: true
+            column: site_name
+        site_url:
+            type: text
+            nullable: true
+            column: site_url
+        email:
+            type: text
+            nullable: true
+            column: email
+        tag:
+            type: text
+            nullable: true
+            column: tag
         del_flg:
             type: smallint
             nullable: false
