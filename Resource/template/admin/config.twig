@@ -17,12 +17,8 @@
                 <form role="form" class="form-horizontal" name="form1" id="form1" method="post" action="{{ url('plugin_KaiUConnection_config') }}">
                     <div id="detail_box__body" class="box-body">
                         {{ form_row(form._token) }}
-
-                        {{ form_row(form.id) }}
                         {{ form_row(form.token) }}
-
                         {{ form_row(form.site_url) }}
-
                         {{ form_row(form.site_name) }}
                         {{ form_row(form.email) }}
                     </div><!-- /.box-body -->
@@ -72,18 +68,8 @@
                                         <td id="tag_list_box__name--{{ tag.id }}">{{ tag.site_name }}</td>
                                         <td id="tag_list_box__email--{{ tag.id }}">{{ tag.email }}</td>
                                         
-
                                         <td id="tag_list_box__menu_box--{{ tag.id }}">
-                                        <div id="tag_list_box__menu_box_toggle--{{ tag.id }}" class="dropdown">
-                                            <a class="dropdown-toggle" data-toggle="dropdown" aria-expanded="false"><svg class="cb cb-ellipsis-h"> <use xlink:href="#cb-ellipsis-h" /></svg></a>
-                                            <ul id="tag_list_box__menu--{{ tag.id }}" class="dropdown-menu dropdown-menu-right">
-                                                {% if tag.tag is null%}
-                                                <li><a href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグ</a>
-                                                {% endif %}
-                                                </li>
-                                                <li><a href="{{ url('plugin_KaiUConnection_delete', {id: tag.id}) }}" {{ csrf_token_for_anchor() }} data-method="delete" data-message="このタグ情報を削除してもよろしいですか？">削除</a></li>
-                                            </ul>
-                                                </div>
+                                        <a class="btn btn-primary btn-lock btn-sm" href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグ</a>
                                         </td>
                                     </tr>
                                 {% endfor %}

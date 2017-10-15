@@ -78,6 +78,9 @@ class ConfigType extends AbstractType
                 $form = $event->getForm();
                 $data = $event->getData();
                 $token = $data->getToken();
+                if (empty($token)) {
+                    return;
+                }
                 $status = $app['kaiu.service.api']->checkToken($token);
                 if (!$status) {
                     $form['token']->addError(new FormError('トークンが無効です。'));

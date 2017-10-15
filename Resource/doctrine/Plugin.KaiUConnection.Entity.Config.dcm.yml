@@ -1,0 +1,37 @@
+Plugin\KaiUConnection\Entity\Config:
+    type: entity
+    table: plg_kaiu_config
+    repositoryClass: Plugin\KaiUConnection\Repository\ConfigRepository
+    id:
+        id:
+            type: integer
+            nullable: false
+            unsigned: false
+            id: true
+            column: config_id
+            generator:
+                strategy: AUTO
+    fields:
+        token:
+            type: text
+            nullable: true
+            column: token
+        name:
+            type: text
+            nullable: true
+            column: site_name
+        url:
+            type: text
+            nullable: true
+            column: site_url
+        email:
+            type: text
+            nullable: true
+            column: email
+        create_date:
+            type: datetime
+            nullable: false
+        update_date:
+            type: datetime
+            nullable: false
+    lifecycleCallbacks: {  }
