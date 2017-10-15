@@ -6,9 +6,7 @@ use Eccube\Application;
 use Eccube\Controller\AbstractController;
 use Plugin\KaiUConnection\Entity\ConfigPlugin;
 use Plugin\KaiUConnection\Entity\Config;
-use Plugin\KaiUConnection\Entity\Tag;
 use Plugin\KaiUConnection\Form\Type\ConfigType;
-use Plugin\KaiUConnection\Repository\TagRepository;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -29,47 +27,47 @@ class ConfigController extends AbstractController
     public function index(Application $app, Request $request)
     {
         /**
-         * @var TagRepository $repo
-         */
-        $repo = $app['kaiu.repository.tag'];
-        $tags = $repo->findBy(array(), array('site_id' => 'DESC'));
-
-        $tag = new Tag();
-
-        /**
          * @var ConfigRepository $repo
          */
         $repo = $app['kaiu.repository.config'];
         $config = $repo->find(1);
-        $this->setDefaultTag($app, $tag, $config);
+        $this->setDefault($app, $config);
+
+        $token = $config->getToken();
+        $sites = array();
+        if (!empty($token)) {
+            $api  = $app['kaiu.service.api'];
+            $sites = $api->getSiteList($token);
+        }
 
         /* @var $form FormInterface */
         $form = $app['form.factory']
-            ->createBuilder('config', $tag)
+            ->createBuilder('config', $config)
             ->getForm();
 
         $form->handleRequest($request);
         if ($form->isSubmitted() && $form->isValid()) {
-            $tag = $form->getData();
-            $app['kaiu.repository.tag']->save($tag);
-
-            // Update config
-            $this->updateConfig($app, $config, $tag);
-
-            $app['kaiu.service.api']->registerSite($tag);
-            $tagStatus = $app['kaiu.service.api']->getSiteId($tag);
-            if (!$tagStatus) {
-                throw new \Exception("Cannot found site id");
+            $data = $form->getData();
+            $app['orm.em']->persist($data);
+            $app['orm.em']->flush($data);
+            $url = $data->getUrl();
+            if (!empty($url)) {
+                $status = $app['kaiu.service.api']->registerSite($data);
+                if (!$status) {
+                    throw new \Exception("Site Url exist in this user! If you want to connect to your account, leave the url empty.");
+                }
+                $app->addSuccess('plugin.connect.add.success', 'admin');
+            } else {
+                $app->addSuccess('plugin.connect.success', 'admin');
             }
 
-            $app->addSuccess('plugin.connect.add.success', 'admin');
             return $app->redirect($app->url('plugin_KaiUConnection_config'));
         }
 
         return $app->render('KaiUConnection/Resource/template/admin/config.twig', 
             array(
                 'form' => $form->createView(),
-                'tags' => $tags
+                'sites' => $sites
                 ));
     }
 
@@ -85,18 +83,13 @@ class ConfigController extends AbstractController
         /**
          * @var TagRepository $repo
          */
-        $repo = $app['kaiu.repository.tag'];
-
-        $tag = null;
-        if ($id) {
-            $tag = $repo->find($id);
-        }
-
-        if (!$tag) {
+        $repo = $app['kaiu.repository.config'];
+        $config = $repo->find(1);
+        if (!$config) {
             throw new NotFoundHttpException();
         }
 
-        $tagStatus = $app['kaiu.service.api']->getSiteTag($tag);
+        $tagStatus = $app['kaiu.service.api']->getSiteTag($config, $id);
         if (!$tagStatus) {
             throw new \Exception("Cannot found site id");
         }
@@ -137,35 +130,18 @@ class ConfigController extends AbstractController
         return $app->redirect($app->url('plugin_KaiUConnection_config'));
     }
 
-    private function setDefaultTag($app, &$tag, $config)
+    private function setDefault($app, &$config)
     {
         if (!$config) {
             $config = new Config();
+            $config->setId(1);
             $BaseInfo = $app['eccube.repository.base_info']->get();
             $config->setEmail($BaseInfo->getEmail01());
             $config->setName($BaseInfo->getShopName());
             if (isset($_SERVER['HTTP_HOST']) && !empty($_SERVER['HTTP_HOST'])) {
                 $url = 'http://'.$_SERVER['HTTP_HOST'];
+                $config->setUrl($url);
             }
-            $config->setURL($url);
         }
-        // Set default
-        $tag->setEmail($config->getEmail());
-        $tag->setSiteName($config->getName());
-        $tag->setSiteUrl($config->getUrl());
-        $tag->setToken($config->getToken());
-    }
-
-    private function updateConfig($app, $config, $tag)
-    {
-        if (!$config) {
-            $config = new Config();
-        }
-        $config->setToken($tag->getToken());
-        $config->setUrl($tag->getSiteUrl());
-        $config->setName($tag->getSiteName());
-        $config->setEmail($tag->getEmail());
-        $app['orm.em']->persist($config);
-        $app['orm.em']->flush($config);
     }
 }

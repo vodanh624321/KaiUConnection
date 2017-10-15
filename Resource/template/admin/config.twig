@@ -17,9 +17,12 @@
                 <form role="form" class="form-horizontal" name="form1" id="form1" method="post" action="{{ url('plugin_KaiUConnection_config') }}">
                     <div id="detail_box__body" class="box-body">
                         {{ form_row(form._token) }}
+                        {{ form_row(form.id) }}
+                        {{ form_row(form.site_id) }}
                         {{ form_row(form.token) }}
-                        {{ form_row(form.site_url) }}
-                        {{ form_row(form.site_name) }}
+                        {{ form_row(form.url) }}
+                        <p class="text-sm-left small">アカウントに接続する場合は、[サイトのURL]フィールドを空のままにします。</p>
+                        {{ form_row(form.name) }}
                         {{ form_row(form.email) }}
                     </div><!-- /.box-body -->
                 </form>
@@ -50,24 +53,25 @@
                 <div id="tag_list_box__body_inner" class="box-body">
                     <div id="tag_list_box__list_box" class="table_list">
                         <div id="tag_list_box__list" class="table-responsive with-border">
-                            <table class="table table-striped">
+                            <table class="table">
                                 <thead>
                                    <tr id="tag_list_box__list_header">
                                         <th id="tag_list_box__header_site">サイトID</th>
                                         <th id="tag_list_box__header_url">サイトのURL</th>
                                         <th id="tag_list_box__header_name">サイト名</th>
                                         <th id="tag_list_box__header_email">メールアドレス</th>
+                                        <th id="tag_list_box__header_description">説明</th>
                                         <th id="tag_list_box__header_menu_box">&nbsp;</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                {% for tag in tags %}
-                                    <tr id="tag_list_box__item--{{ tag.id }}">
-                                        <td id="tag_list_box__site--{{ tag.id }}">{{ tag.site_id }}</td>
-                                        <td id="tag_list_box__url--{{ tag.id }}">{{ tag.site_url }}</td>
-                                        <td id="tag_list_box__name--{{ tag.id }}">{{ tag.site_name }}</td>
-                                        <td id="tag_list_box__email--{{ tag.id }}">{{ tag.email }}</td>
-                                        
+                                {% for tag in sites %}
+                                    <tr {% if tag.id == form.site_id.vars.value %}class="success"{% endif %} id="tag_list_box__item--{{ tag.id }}">
+                                        <td id="tag_list_box__site--{{ tag.id }}">{{ tag.id }}</td>
+                                        <td id="tag_list_box__url--{{ tag.id }}">{{ tag.url }}</td>
+                                        <td id="tag_list_box__name--{{ tag.id }}">{{ tag.title }}</td>
+                                        <td id="tag_list_box__email--{{ tag.id }}"></td>
+                                        <td id="tag_list_box__discription--{{ tag.id }}">{{ tag.description|ellipsis(50) }}</td>
                                         <td id="tag_list_box__menu_box--{{ tag.id }}">
                                         <a class="btn btn-primary btn-lock btn-sm" href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグ</a>
                                         </td>

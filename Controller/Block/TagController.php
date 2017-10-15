@@ -20,14 +20,12 @@ class TagController
     public function index(Application $app)
     {
         /**
-         * @var TagRepository $repo
+         * @var ConfigRepository $repo
          */
-        $repo = $app['kaiu.repository.tag'];
-        $tags = $repo->findAll();
+        $repo = $app['kaiu.repository.config'];
+        $config = $repo->find(1);
         $arrTag = array();
-        foreach ($tags as $value) {
-            $arrTag[] = unserialize($value->getTag());
-        }
+        $arrTag[] = unserialize($config->getTag());
 
         return $app->render('Block/kaiu_tag_block.twig', array(
             'tags' => $arrTag,

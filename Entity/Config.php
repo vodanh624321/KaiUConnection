@@ -15,6 +15,11 @@ class Config extends \Eccube\Entity\AbstractEntity
     private $id;
 
     /**
+     * @var integer
+     */
+    private $site_id;
+
+    /**
      * @var string
      */
     private $name;
@@ -33,6 +38,11 @@ class Config extends \Eccube\Entity\AbstractEntity
      * @var string
      */
     private $email;
+
+    /**
+     * @var string
+     */
+    private $tag;
 
     /**
      * @var \DateTime
@@ -71,6 +81,29 @@ class Config extends \Eccube\Entity\AbstractEntity
     public function setId($id)
     {
         $this->id = $id;
+
+        return $this;
+    }
+
+    /**
+     * Get id
+     *
+     * @return integer
+     */
+    public function getSiteId()
+    {
+        return $this->site_id;
+    }
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setSiteId($id)
+    {
+        $this->site_id = $id;
 
         return $this;
     }
@@ -166,6 +199,29 @@ class Config extends \Eccube\Entity\AbstractEntity
     public function getEmail()
     {
         return $this->email;
+    }
+
+    /**
+     * Set sub_data
+     *
+     * @param  string $subData
+     * @return $this
+     */
+    public function setTag($subData)
+    {
+        $this->tag = $subData;
+
+        return $this;
+    }
+
+    /**
+     * Get sub_data
+     *
+     * @return string
+     */
+    public function getTag()
+    {
+        return $this->tag;
     }
 
     /**

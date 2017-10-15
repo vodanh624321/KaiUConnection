@@ -35,12 +35,12 @@ class ApiService
         return true;
     }
 
-    public function registerSite($tag)
+    public function registerSite($config)
     {
         $url = $this->app['config']['KaiUConnection']['const']['api_url'];
 
         // Create site id
-        list($result, $info) = $this->postApi($url, $tag);
+        list($result, $info) = $this->postApi($url, $config);
 
         $data = json_decode($result, true);
         if (!isset($data['script']) || empty($data['script'])) {
@@ -50,61 +50,50 @@ class ApiService
         return true;
     }
 
-    public function getSiteId($tag)
+    public function getSiteList($token)
     {
         $url = $this->app['config']['KaiUConnection']['const']['api_url'];
 
         // Create site id and get tag
-        list($result, $info) = $this->getApi($url, $tag->getToken());
+        list($result, $info) = $this->getApi($url, $token);
         
         $data = json_decode($result, true);
         if (!isset($data['sites'])) {
-            $this->app->log('Get sites tag error:', $data);
+            $this->app->log('KaiUConnection get sites tag error:', $data);
 
             return false;
         }
 
         $sites = $data['sites'];
-        if (!function_exists('array_column')) {
-            $siteUrl = array_map(function($element) {
-                return $element['url'];
-            }, $sites);
-        } else {
-            $siteUrl = array_column($sites, 'url');
-        }
 
-        $index = array_search($tag->getSiteUrl(), $siteUrl);
-        if ($index === false) {
-            $this->app->log('Cannot found site id!');
-
-            return false;
-        }
-        $tag->setSiteId($sites[$index]['id']);
-        $this->app['kaiu.repository.tag']->save($tag);
-
-        return true;
+        // usort($sites, function($a, $b) {
+        //     if ($a['id'] == $b['id']) {
+        //         return 0;
+        //     }
+        //     return ($a['id'] > $b['id']) ? -1 : 1;
+        // });
+        
+        return array_reverse($sites);
     }
 
-    public function getSiteTag($tag)
+    public function getSiteTag($config, $siteId)
     {
-        if (!$tag->getSiteId()) {
-            return false;
-        }
-        $url = $this->app['config']['KaiUConnection']['const']['api_url'].'/'.$tag->getSiteId();
+        $url = $this->app['config']['KaiUConnection']['const']['api_url'].'/'.$siteId;
 
-        // get tag
-        list($result, $info) = $this->getApi($url, $tag->getToken());
+        // get config
+        list($result, $info) = $this->getApi($url, $config->getToken());
         $data = json_decode($result, true);
 
         if (!isset($data['script']) || empty($data['script'])) {
-            $this->app->log('Get site tag error:', $data);
+            $this->app->log('KaiUConnection get site config error:', $data);
 
             return false;
         }
-        $tagScript = serialize($data['script']);
-
-        $tag->setTag($tagScript);
-        $this->app['kaiu.repository.tag']->save($tag);
+        $configScript = serialize($data['script']);
+        $config->setTag($configScript);
+        $config->setSiteId($siteId);
+        $this->app['orm.em']->persist($config);
+        $this->app['orm.em']->flush($config);
 
         return true;
     }
@@ -134,12 +123,12 @@ class ApiService
         $info['message'] = $message;
         curl_close($curl);
 
-        $this->app->log('KaiUConnection request get: ', $info);
+        // $this->app->log('KaiUConnection request get: ', $info);
 
         return array($result, $info);        
     }
 
-    public function postApi($url, $tag)
+    public function postApi($url, $config)
     {
         $curl = curl_init($url);
 
@@ -148,7 +137,7 @@ class ApiService
             CURLOPT_HTTPHEADER => array(
                 'cache-control: no-cache',
                 'content-type: application/json',
-                'kaiu-auth-token: '.$tag->getToken(),
+                'kaiu-auth-token: '.$config->getToken(),
             ),
             CURLOPT_POST => true,
             CURLOPT_SSL_VERIFYPEER => false,
@@ -157,15 +146,15 @@ class ApiService
 
         curl_setopt_array($curl, $options);
 
-        $shopName = $this->app['config']['shop_name'];
+        // $shopName = $this->app['config']['shop_name'];
         $body = array(
             'site' => array(
-                'title' => $shopName,
-                'url' => $tag->getSiteUrl(),
+                'title' => $config->getName(),
+                'url' => $config->getUrl(),
                 'pic_sites_attributes' => array(
                     0 => array(
-                        "name" => $tag->getSiteName(),
-                        "email" => $tag->getEmail(),
+                        "name" => $config->getName(),
+                        "email" => $config->getEmail(),
                         "report_flag" => "0"
                         ),
                     ),
@@ -180,7 +169,7 @@ class ApiService
         $info['message'] = $message;
         curl_close($curl);
 
-        $this->app->log('KaiUConnection request post: ', $info);
+        // $this->app->log('KaiUConnection request post: ', $info);
 
         return array($result, $info);        
     }

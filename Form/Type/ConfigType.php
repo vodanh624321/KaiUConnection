@@ -34,6 +34,7 @@ class ConfigType extends AbstractType
         $config = $app['config'];
         $builder
             ->add('id', 'hidden')
+            ->add('site_id', 'hidden')
             ->add('token', 'text', array(
                 'label' => 'サイトトークン',
                 'required' => true,
@@ -45,22 +46,20 @@ class ConfigType extends AbstractType
                     new Assert\Length(array('max' => $config['stext_len'])),
                 ),
             ))
-            ->add('site_url', 'text', array(
+            ->add('url', 'text', array(
                 'label' => 'サイトのURL',
                 'required' => false,
                 'constraints' => array(
-                    new Assert\NotBlank(),
                     new Assert\Url(),
                 ),
             ))
-            ->add('site_name', 'text', array(
+            ->add('name', 'text', array(
                 'label' => 'サイト名',
                 'required' => false,
                 'attr' => array(
                     'maxlength' => $config['stext_len'],
                 ),
                 'constraints' => array(
-                    new Assert\NotBlank(),
                     new Assert\Length(array('max' => $config['stext_len'])),
                 ),
             ))
@@ -71,7 +70,6 @@ class ConfigType extends AbstractType
                     'maxlength' => $config['stext_len'],
                 ),
                 'constraints' => array(
-                    new Assert\NotBlank(),
                     new Assert\Email(),
                 ),
             ))->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($app) {
@@ -84,6 +82,23 @@ class ConfigType extends AbstractType
                 $status = $app['kaiu.service.api']->checkToken($token);
                 if (!$status) {
                     $form['token']->addError(new FormError('トークンが無効です。'));
+
+                    return;
+                }
+                $sites = $app['kaiu.service.api']->getSiteList($token);
+
+                $url = $data->getUrl();
+                if (!function_exists('array_column')) {
+                    $siteUrl = array_map(function($element) {
+                        return $element['url'];
+                    }, $sites);
+                } else {
+                    $siteUrl = array_column($sites, 'url');
+                }
+
+                $index = array_search($url, $siteUrl);
+                if ($index !== false) {
+                    $form['url']->addError(new FormError('このユーザーのウェブサイトは既に存在しています！'));
                 }
             });
     }
@@ -91,7 +106,7 @@ class ConfigType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(array(
-            'data_class' => 'Plugin\KaiUConnection\Entity\Tag',
+            'data_class' => 'Plugin\KaiUConnection\Entity\Config',
         ));
     }
     /**

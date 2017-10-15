@@ -17,16 +17,8 @@ class ConnectionServiceProvider implements ServiceProviderInterface
         '\\Plugin\\KaiUConnection\\Controller\\ConfigController::getTag')->assert('id', '\d+')
         ->bind('plugin_KaiUConnection_get');
 
-        // $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/{id}/delete',
-        // '\\Plugin\\KaiUConnection\\Controller\\ConfigController::deleteTag')->assert('id', '\d+')
-        // ->bind('plugin_KaiUConnection_delete');
-
         $app->match('/block/kaiu_tag_block', '\Plugin\KaiUConnection\Controller\Block\TagController::index')
             ->bind('block_kaiu_tag_block');
-
-        $app['kaiu.repository.tag'] = $app->share(function () use ($app) {
-            return $app['orm.em']->getRepository('Plugin\KaiUConnection\Entity\Tag');
-        });
 
         $app['kaiu.repository.config'] = $app->share(function () use ($app) {
             return $app['orm.em']->getRepository('Plugin\KaiUConnection\Entity\Config');

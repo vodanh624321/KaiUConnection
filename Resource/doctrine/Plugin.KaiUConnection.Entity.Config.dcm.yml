@@ -9,13 +9,15 @@ Plugin\KaiUConnection\Entity\Config:
             unsigned: false
             id: true
             column: config_id
-            generator:
-                strategy: AUTO
     fields:
         token:
             type: text
             nullable: true
             column: token
+        site_id:
+            type: text
+            nullable: true
+            column: site_id
         name:
             type: text
             nullable: true
@@ -28,6 +30,10 @@ Plugin\KaiUConnection\Entity\Config:
             type: text
             nullable: true
             column: email
+        tag:
+            type: text
+            nullable: true
+            column: tag
         create_date:
             type: datetime
             nullable: false
