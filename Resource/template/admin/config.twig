@@ -20,9 +20,9 @@
                         {{ form_row(form.id) }}
                         {{ form_row(form.site_id) }}
                         {{ form_row(form.token) }}
-                        <div class="row marB12">
+                        {#<div class="row marB12">
                             <div class="col-sm-offset-2 col-sm-10"><button id="btn_connect" class="btn btn-default btn-sm" {{ csrf_token_for_anchor() }}>サイト一覧取得</button></div>
-                        </div>
+                        </div>#}
                         {{ form_row(form.url) }}
                         {#<p class="text-sm-left small">アカウントに接続する場合は、[サイトのURL]フィールドを空のままにします。</p>#}
                         {{ form_row(form.name) }}
@@ -60,7 +60,7 @@
                                 <thead>
                                    <tr id="tag_list_box__list_header">
                                         <th id="tag_list_box__header_site">サイトID</th>
-                                        <th id="tag_list_box__header_url">サイトのURL</th>
+                                        <th id="tag_list_box__header_url">サイトURL</th>
                                         <th id="tag_list_box__header_name">サイト名</th>
                                         {#<th id="tag_list_box__header_email">メールアドレス</th>#}
                                         {#<th id="tag_list_box__header_description">説明</th>#}
@@ -76,7 +76,7 @@
                                         {#<td id="tag_list_box__email--{{ tag.id }}"></td>#}
                                         {#<td id="tag_list_box__discription--{{ tag.id }}">{{ tag.description|ellipsis(50) }}</td>#}
                                         <td id="tag_list_box__menu_box--{{ tag.id }}">
-                                        <a class="btn btn-primary btn-lock btn-sm" href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグ</a>
+                                        <a class="btn btn-primary btn-lock btn-sm" href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグの取得</a>
                                         </td>
                                     </tr>
                                 {% endfor %}

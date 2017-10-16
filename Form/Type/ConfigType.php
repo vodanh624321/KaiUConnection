@@ -47,7 +47,7 @@ class ConfigType extends AbstractType
                 ),
             ))
             ->add('url', 'text', array(
-                'label' => 'サイトのURL',
+                'label' => 'サイトURL',
                 'required' => true,
                 'constraints' => array(
                     new Assert\NotBlank(),
@@ -104,7 +104,7 @@ class ConfigType extends AbstractType
 
                 $index = array_search($url, $siteUrl);
                 if ($index !== false) {
-                    $form['url']->addError(new FormError('このユーザーのウェブサイトは既に存在しています！'));
+                    $form['url']->addError(new FormError('このサイトは既に存在しています！'));
                 }
             });
     }
