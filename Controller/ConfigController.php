@@ -4,9 +4,9 @@ namespace Plugin\KaiUConnection\Controller;
 
 use Eccube\Application;
 use Eccube\Controller\AbstractController;
-use Plugin\KaiUConnection\Entity\ConfigPlugin;
 use Plugin\KaiUConnection\Entity\Config;
-use Plugin\KaiUConnection\Form\Type\ConfigType;
+use Plugin\KaiUConnection\Repository\ConfigRepository;
+use Plugin\KaiUConnection\Service\ApiService;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -72,6 +72,67 @@ class ConfigController extends AbstractController
     }
 
     /**
+     * @param Application $app
+     * @param Request $request
+     * @param $id
+     * @return Response
+     */
+    public function getList(Application $app, Request $request, $id)
+    {
+        $this->isTokenValid($app);
+
+        /**
+         * @var ConfigRepository $repo
+         */
+        $repo = $app['kaiu.repository.config'];
+        /**
+         * @var Config $config
+         */
+        $config = $repo->find(1);
+        $this->setDefault($app, $config);
+        $config->setToken($id);
+        $app['orm.em']->persist($config);
+        $app['orm.em']->flush($config);
+
+        $app->addSuccess('plugin.connect.success', 'admin');
+        return $app->redirect($app->url('plugin_KaiUConnection_config'));
+    }
+
+    /**
+     * @param Application $app
+     * @param Request $request
+     * @return Response
+     */
+    public function checkToken(Application $app, Request $request)
+    {
+        if (!$request->isXmlHttpRequest()) {
+            $response = new Response(json_encode('0'), 500);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        }
+        /**
+         * @var ApiService $api
+         */
+        $api = $app['kaiu.service.api'];
+        $data = $request->request->get('token');
+
+        if (!$data) {
+            $response = new Response(json_encode('0'), 500);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        }
+
+        $status = $api->checkToken($data);
+
+        $response = new Response(json_encode($status));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
      * get Tag
      *
      * @param Application $app
@@ -81,7 +142,7 @@ class ConfigController extends AbstractController
     public function getTag(Application $app, Request $request, $id)
     {
         /**
-         * @var TagRepository $repo
+         * @var ConfigRepository $repo
          */
         $repo = $app['kaiu.repository.config'];
         $config = $repo->find(1);
@@ -110,7 +171,7 @@ class ConfigController extends AbstractController
     {
         $this->isTokenValid($app);
         /**
-         * @var TagRepository $repo
+         * @var ConfigRepository $repo
          */
         $repo = $app['kaiu.repository.tag'];
 
@@ -130,7 +191,11 @@ class ConfigController extends AbstractController
         return $app->redirect($app->url('plugin_KaiUConnection_config'));
     }
 
-    private function setDefault($app, &$config)
+    /**
+     * @param $app
+     * @param $config
+     */
+    private function setDefault(Application $app, &$config)
     {
         if (!$config) {
             $config = new Config();

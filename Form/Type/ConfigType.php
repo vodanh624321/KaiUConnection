@@ -36,7 +36,7 @@ class ConfigType extends AbstractType
             ->add('id', 'hidden')
             ->add('site_id', 'hidden')
             ->add('token', 'text', array(
-                'label' => 'サイトトークン',
+                'label' => '認証トークン',
                 'required' => true,
                 'attr' => array(
                     'maxlength' => $config['stext_len'],
@@ -48,28 +48,31 @@ class ConfigType extends AbstractType
             ))
             ->add('url', 'text', array(
                 'label' => 'サイトのURL',
-                'required' => false,
+                'required' => true,
                 'constraints' => array(
+                    new Assert\NotBlank(),
                     new Assert\Url(),
                 ),
             ))
             ->add('name', 'text', array(
                 'label' => 'サイト名',
-                'required' => false,
+                'required' => true,
                 'attr' => array(
                     'maxlength' => $config['stext_len'],
                 ),
                 'constraints' => array(
+                    new Assert\NotBlank(),
                     new Assert\Length(array('max' => $config['stext_len'])),
                 ),
             ))
             ->add('email', 'email', array(
-                'required' => false,
+                'required' => true,
                 'label' => 'Email',
                 'attr' => array(
                     'maxlength' => $config['stext_len'],
                 ),
                 'constraints' => array(
+                    new Assert\NotBlank(),
                     new Assert\Email(),
                 ),
             ))->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) use ($app) {
@@ -88,6 +91,9 @@ class ConfigType extends AbstractType
                 $sites = $app['kaiu.service.api']->getSiteList($token);
 
                 $url = $data->getUrl();
+                if (empty($url)) {
+                    return;
+                }
                 if (!function_exists('array_column')) {
                     $siteUrl = array_map(function($element) {
                         return $element['url'];

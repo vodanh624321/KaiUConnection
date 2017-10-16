@@ -20,8 +20,11 @@
                         {{ form_row(form.id) }}
                         {{ form_row(form.site_id) }}
                         {{ form_row(form.token) }}
+                        <div class="row marB12">
+                            <div class="col-sm-offset-2 col-sm-10"><button id="btn_connect" class="btn btn-default btn-sm" {{ csrf_token_for_anchor() }}>サイト一覧取得</button></div>
+                        </div>
                         {{ form_row(form.url) }}
-                        <p class="text-sm-left small">アカウントに接続する場合は、[サイトのURL]フィールドを空のままにします。</p>
+                        {#<p class="text-sm-left small">アカウントに接続する場合は、[サイトのURL]フィールドを空のままにします。</p>#}
                         {{ form_row(form.name) }}
                         {{ form_row(form.email) }}
                     </div><!-- /.box-body -->
@@ -29,7 +32,7 @@
             </div><!-- /.box -->
         </div><!-- /.col -->
 
-        <div class="col-md-3" id="aside_column">
+        <div class="col-md-3" id="aside_column1">
             <div id="common_box" class="col_inner">
                 <div id="common_box__body" class="box no-header">
                     <div id="common_button_box" class="box-body">
@@ -59,8 +62,8 @@
                                         <th id="tag_list_box__header_site">サイトID</th>
                                         <th id="tag_list_box__header_url">サイトのURL</th>
                                         <th id="tag_list_box__header_name">サイト名</th>
-                                        <th id="tag_list_box__header_email">メールアドレス</th>
-                                        <th id="tag_list_box__header_description">説明</th>
+                                        {#<th id="tag_list_box__header_email">メールアドレス</th>#}
+                                        {#<th id="tag_list_box__header_description">説明</th>#}
                                         <th id="tag_list_box__header_menu_box">&nbsp;</th>
                                     </tr>
                                 </thead>
@@ -70,8 +73,8 @@
                                         <td id="tag_list_box__site--{{ tag.id }}">{{ tag.id }}</td>
                                         <td id="tag_list_box__url--{{ tag.id }}">{{ tag.url }}</td>
                                         <td id="tag_list_box__name--{{ tag.id }}">{{ tag.title }}</td>
-                                        <td id="tag_list_box__email--{{ tag.id }}"></td>
-                                        <td id="tag_list_box__discription--{{ tag.id }}">{{ tag.description|ellipsis(50) }}</td>
+                                        {#<td id="tag_list_box__email--{{ tag.id }}"></td>#}
+                                        {#<td id="tag_list_box__discription--{{ tag.id }}">{{ tag.description|ellipsis(50) }}</td>#}
                                         <td id="tag_list_box__menu_box--{{ tag.id }}">
                                         <a class="btn btn-primary btn-lock btn-sm" href="{{ url('plugin_KaiUConnection_get', {id: tag.id}) }}">サイトタグ</a>
                                         </td>
@@ -85,4 +88,53 @@
             </div><!-- /.box -->
         </div>
     </div>
+{% endblock %}
+{% block javascript %}
+    <script>
+        $(function(){
+            var createForm = function (action, data) {
+                var $form = $('<form action="' + action + '" method="post"></form>');
+                for (input in data) {
+                    if (data.hasOwnProperty(input)) {
+                        $form.append('<input name="' + input + '" value="' + data[input] + '">');
+                    }
+                }
+                return $form;
+            };
+
+            $('#btn_connect').on('click', function (e) {
+                e.preventDefault();
+                var action = '{{ url('plugin_KaiUConnection_connect', {'id' : '__temp__'}) }}';
+                var token = $('#config_token').val();
+                var postData = {'token': token};
+                action = action.replace('__temp__', token);
+                var __token = $(this).attr('token-for-anchor');
+                var $form = createForm(action, {
+                    _token: __token
+                }).hide();
+
+                $('body').append($form); // Firefox requires form to be on the page to allow submission
+
+                $.ajax({
+                    url: "{{ url('plugin_KaiUConnection_check') }}",
+                    type: 'POST',
+                    data: postData,
+                    dataType: 'json'
+                }).done(function(data) {
+                    if (data == false) {
+                        alert('トークンが無効です。');
+                        return;
+                    } else {
+                        $form.submit();
+                    }
+                    console.log(data);
+                }).fail(function(){
+                    alert('トークンが無効です。');
+                    return;
+                });
+
+
+            });
+        });
+    </script>
 {% endblock %}

@@ -17,6 +17,15 @@ class ConnectionServiceProvider implements ServiceProviderInterface
         '\\Plugin\\KaiUConnection\\Controller\\ConfigController::getTag')->assert('id', '\d+')
         ->bind('plugin_KaiUConnection_get');
 
+        $app->match('/' . $app["config"]["admin_route"] . '/plugin/connect/{id}/connect',
+            '\\Plugin\\KaiUConnection\\Controller\\ConfigController::getList')->assert('id', '\w+')
+            ->bind('plugin_KaiUConnection_connect');
+
+        $app->post('/' . $app["config"]["admin_route"] . '/plugin/connect/check',
+            '\\Plugin\\KaiUConnection\\Controller\\ConfigController::checkToken')
+            ->bind('plugin_KaiUConnection_check');
+
+
         $app->match('/block/kaiu_tag_block', '\Plugin\KaiUConnection\Controller\Block\TagController::index')
             ->bind('block_kaiu_tag_block');
 

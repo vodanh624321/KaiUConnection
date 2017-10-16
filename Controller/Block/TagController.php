@@ -1,9 +1,8 @@
 <?php
 namespace Plugin\KaiUConnection\Controller\Block;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Eccube\Application;
-use Eccube\Entity\Master\Disp;
+use Plugin\KaiUConnection\Repository\ConfigRepository;
 use Symfony\Component\HttpFoundation\Response;
 /**
  * Class RecommendController.
